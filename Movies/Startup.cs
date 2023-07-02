@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Movies.Data;
 
 namespace Movies;
 
@@ -14,12 +15,11 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
-        
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-    // services.AddDbContext<ApplicationDbContext>(options =>
-    // options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+        services.AddAutoMapper(typeof(Startup));
+        // services.AddEndpointsApiExplorer();
+ 
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection")));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -32,39 +32,6 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseAuthorization();
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
+        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 }
-
-// using Microsoft.EntityFrameworkCore;
-//
-// var builder = WebApplication.CreateBuilder(args);
-//
-// // Add services to the container.
-//
-// builder.Services.AddControllers();
-//
-// builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
-// builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-//
-// var app = builder.Build();
-//
-// // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseSwagger();
-//     app.UseSwaggerUI();
-// }
-//
-// app.UseHttpsRedirection();
-//
-// app.UseAuthorization();
-//
-// app.MapControllers();
-//
-// app.Run();
