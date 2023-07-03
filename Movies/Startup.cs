@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Movies.Data;
+using Movies.Services;
 
 namespace Movies;
 
@@ -15,6 +16,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
+        services.AddTransient<IFileManager, AzureFileManager>();
         services.AddAutoMapper(typeof(Startup));
         // services.AddEndpointsApiExplorer();
  

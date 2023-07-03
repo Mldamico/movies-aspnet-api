@@ -1,13 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "7s+xgi7bNNhxkVPuxkghh51HMNlhIIktYQiox+OM9O5inx3+1G3vmHokoQLn0Z+2nn4aD8IeBbgqyY4K5p9a0g==",
+  "dgSpecHash": "ZboNpECxI87uIlNxlSEa8OWpYPECXoY5Tc8bZyr42WIEGZysHA27TzmNEV4oBP+XB+7nlIgoaVl1dv2e9bw1kQ==",
   "success": true,
   "projectFilePath": "/Users/sebastiandamico/RiderProjects/Movies/Movies/Movies.csproj",
   "expectedPackageFiles": [
     "/Users/sebastiandamico/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/12.0.1/automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/azure.core/1.32.0/azure.core.1.32.0.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/azure.storage.blobs/12.17.0-beta.1/azure.storage.blobs.12.17.0-beta.1.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/azure.storage.common/12.16.0-beta.1/azure.storage.common.12.16.0-beta.1.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/microsoft.aspnetcore.openapi/7.0.8/microsoft.aspnetcore.openapi.7.0.8.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/microsoft.bcl.asyncinterfaces/1.1.1/microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/microsoft.entityframeworkcore/7.0.8/microsoft.entityframeworkcore.7.0.8.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/microsoft.entityframeworkcore.abstractions/7.0.8/microsoft.entityframeworkcore.abstractions.7.0.8.nupkg.sha512",
@@ -34,8 +38,13 @@
     "/Users/sebastiandamico/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.5.0/swashbuckle.aspnetcore.swaggergen.6.5.0.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.5.0/swashbuckle.aspnetcore.swaggerui.6.5.0.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/system.codedom/4.4.0/system.codedom.4.4.0.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/system.diagnostics.diagnosticsource/4.6.0/system.diagnostics.diagnosticsource.4.6.0.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/system.io.hashing/6.0.0/system.io.hashing.6.0.0.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/system.memory.data/1.0.2/system.memory.data.1.0.2.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/system.numerics.vectors/4.5.0/system.numerics.vectors.4.5.0.nupkg.sha512",
     "/Users/sebastiandamico/.nuget/packages/system.text.encodings.web/7.0.0/system.text.encodings.web.7.0.0.nupkg.sha512",
-    "/Users/sebastiandamico/.nuget/packages/system.text.json/7.0.0/system.text.json.7.0.0.nupkg.sha512"
+    "/Users/sebastiandamico/.nuget/packages/system.text.json/7.0.0/system.text.json.7.0.0.nupkg.sha512",
+    "/Users/sebastiandamico/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512"
   ],
   "logs": []
 }
