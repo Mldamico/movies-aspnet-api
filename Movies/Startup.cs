@@ -28,6 +28,7 @@ public class Startup
         {
             app.UseDeveloperExceptionPage();
         }
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         app.UseHttpsRedirection();
         app.UseRouting();
