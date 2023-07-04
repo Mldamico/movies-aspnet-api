@@ -9,7 +9,7 @@ public class AzureFileManager : IFileManager
 
     public AzureFileManager(IConfiguration configuration)
     {
-        connectionString = configuration.GetConnectionString("AzureStorage");
+        connectionString = configuration["AzureStorage"];
     }
     
     public async Task<string> SaveFile(byte[] content, string extension, string container, string contentType)
