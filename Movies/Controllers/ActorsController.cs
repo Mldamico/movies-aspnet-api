@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Movies.Data;
 using Movies.DTOs;
 using Movies.Entities;
+using Movies.Helpers;
 using Movies.Services;
 
 namespace Movies.Controllers;
@@ -26,11 +27,13 @@ public class ActorsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<ActorDto>>> GetActors()
+    public async Task<ActionResult<List<ActorDto>>> GetActors([FromQuery] PaginationDto paginationDto)
     {
-        var actors = await _context.Actors.ToListAsync();
-        var actorsDto = _mapper.Map<List<ActorDto>>(actors);
-        return actorsDto;
+        var queryable = _context.Actors.AsQueryable();
+        await HttpContext.PaginationParameters(queryable, paginationDto.AmountPerPage);
+        var actors = await queryable.Paginate(paginationDto).ToListAsync();
+        return  _mapper.Map<List<ActorDto>>(actors);
+       
     }
 
     [HttpGet("{id:int}", Name = "GetActor")]
