@@ -49,3 +49,4 @@
 /Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/Microsoft.Bcl.AsyncInterfaces.dll
 /Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/System.IO.Hashing.dll
 /Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/System.Memory.Data.dll
+/Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/Movies.staticwebassets.runtime.json

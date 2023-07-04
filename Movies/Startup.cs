@@ -16,7 +16,8 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
-        services.AddTransient<IFileManager, AzureFileManager>();
+        services.AddTransient<IFileManager, LocalFileManager>();
+        services.AddHttpContextAccessor(); // For local resources
         services.AddAutoMapper(typeof(Startup));
         // services.AddEndpointsApiExplorer();
  

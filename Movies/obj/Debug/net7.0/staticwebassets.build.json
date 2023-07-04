@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "8CKhrIB1qRS4XFYLr4nfmsW+EwIfwl0aEk3CYqNZxG0=",
+  "Hash": "sw3eiUMpKL1afFp7hcbs5rsF+xyDXShj9hroMHGpmbQ=",
   "Source": "Movies",
   "BasePath": "_content/Movies",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Movies/wwwroot",
+      "Source": "Movies",
+      "ContentRoot": "/Users/sebastiandamico/RiderProjects/Movies/Movies/wwwroot/",
+      "BasePath": "_content/Movies",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }
