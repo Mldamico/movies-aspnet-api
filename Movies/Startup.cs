@@ -15,12 +15,13 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers();
-        services.AddTransient<IFileManager, LocalFileManager>();
+        services.AddControllers().AddNewtonsoftJson();
+        services.AddTransient<IFileManager, AzureFileManager>();
+        // services.AddTransient<IFileManager, LocalFileManager>();
         services.AddHttpContextAccessor(); // For local resources
         services.AddAutoMapper(typeof(Startup));
         // services.AddEndpointsApiExplorer();
- 
+        
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection")));
     }
@@ -34,6 +35,7 @@ public class Startup
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         app.UseHttpsRedirection();
+        app.UseStaticFiles();
         app.UseRouting();
         app.UseAuthorization();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

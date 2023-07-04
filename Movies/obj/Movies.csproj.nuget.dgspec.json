@@ -50,6 +50,14 @@
               "target": "Package",
               "version": "[12.17.0-beta.1, )"
             },
+            "Microsoft.AspNetCore.JsonPatch": {
+              "target": "Package",
+              "version": "[7.0.8, )"
+            },
+            "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
+              "target": "Package",
+              "version": "[7.0.8, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.8, )"

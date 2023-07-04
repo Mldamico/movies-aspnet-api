@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Movies.Data;
@@ -65,6 +66,29 @@ public class ActorsController : ControllerBase
  
     }
 
+    [HttpPatch("{id}")]
+    public async Task<ActionResult<Actor>> UpdateActorPatch(int id, JsonPatchDocument<ActorPatchDto> patchDocument)
+    {
+        if (patchDocument == null) return BadRequest(new ProblemDetails {Title = "Problem updating the actor"});
+        var actor = await _context.Actors.FindAsync(id);
+        if (actor == null) return NotFound();
+
+        var actorDto = _mapper.Map<ActorPatchDto>(actor);
+        
+        patchDocument.ApplyTo(actorDto, ModelState);
+
+        var isValid = TryValidateModel(actorDto);
+
+        if (!isValid) return BadRequest(ModelState);
+
+        _mapper.Map(actorDto, actor);
+
+        var result = await _context.SaveChangesAsync() > 0;
+
+        if (result) return Ok(actor);
+        return BadRequest(new ProblemDetails{Title = "Problem updating actor"});
+    }
+    
     [HttpPut("{id:int}")]
     public async Task<ActionResult<Actor>> UpdateActor(int id, [FromForm]ActorCreateDto actorDto)
     {
