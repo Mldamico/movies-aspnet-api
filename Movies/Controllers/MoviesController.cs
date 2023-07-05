@@ -102,7 +102,7 @@ public class MoviesController: ControllerBase
                 await movieDto.Poster.CopyToAsync(memoryStream);
                 var content = memoryStream.ToArray();
                 var extension = Path.GetExtension(movieDto.Poster.FileName);
-                movieDb.Poster = await _fileManager.EditFile(content, extension, _container, movieDb.Poster , movieDto.Poster.ContentType);
+                movieDb.Poster = await _fileManager.EditFile(content, extension, _container, movieDb.Poster, movieDto.Poster.ContentType);
             }
         }
         
