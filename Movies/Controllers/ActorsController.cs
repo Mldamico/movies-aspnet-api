@@ -17,7 +17,7 @@ public class ActorsController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IFileManager _fileManager;
-    private readonly string container = "actors";
+    private readonly string _container = "actors";
 
     public ActorsController(ApplicationDbContext context, IMapper mapper, IFileManager fileManager)
     {
@@ -57,7 +57,7 @@ public class ActorsController : ControllerBase
                 await actorDto.Photo.CopyToAsync(memoryStream);
                 var content = memoryStream.ToArray();
                 var extension = Path.GetExtension(actorDto.Photo.FileName);
-                actor.Photo = await _fileManager.SaveFile(content, extension, container, actorDto.Photo.ContentType);
+                actor.Photo = await _fileManager.SaveFile(content, extension, _container, actorDto.Photo.ContentType);
             }
         }
         _context.Add(actor);
@@ -110,7 +110,7 @@ public class ActorsController : ControllerBase
                 await actorDto.Photo.CopyToAsync(memoryStream);
                 var content = memoryStream.ToArray();
                 var extension = Path.GetExtension(actorDto.Photo.FileName);
-                actorDb.Photo = await _fileManager.EditFile(content, extension, container, actorDb.Photo ,actorDto.Photo.ContentType);
+                actorDb.Photo = await _fileManager.EditFile(content, extension, _container, actorDb.Photo ,actorDto.Photo.ContentType);
             }
         }
         
