@@ -15,7 +15,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<MoviesActors>()
             .HasKey(x => new { x.ActorId, x.MovieId });
         modelBuilder.Entity<MoviesGenres>()
-            .HasKey(x => new { x.MovieId, x.GenreId });
+            .HasKey(x => new {  x.GenreId, x.MovieId });
         base.OnModelCreating(modelBuilder);
     }
 

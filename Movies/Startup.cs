@@ -15,13 +15,14 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers().AddNewtonsoftJson();
+       
         services.AddTransient<IFileManager, AzureFileManager>();
         // services.AddTransient<IFileManager, LocalFileManager>();
         services.AddHttpContextAccessor(); // For local resources
         services.AddAutoMapper(typeof(Startup));
         // services.AddEndpointsApiExplorer();
-        
+        services.AddControllers();
+            // .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection")));
     }

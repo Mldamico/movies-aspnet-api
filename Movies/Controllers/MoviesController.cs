@@ -32,33 +32,54 @@ public class MoviesController: ControllerBase
         return _mapper.Map<List<MovieDto>>(movies);
     }
 
-    [HttpGet("{id}", Name = "GetMovie")]
+    [HttpGet("{id:int}", Name = "GetMovie")]
     public async Task<ActionResult<MovieDto>> GetMovieById(int id)
     {
-        var movie = await _context.Movies.FindAsync(id);
+        var movie = await _context.Movies.FirstOrDefaultAsync(x => x.Id == id);
         if (movie == null) return NotFound();
-        return _mapper.Map<MovieDto>(movie);
+        // return _mapper.Map<MovieDto>(movie);
+        return new MovieDto {
+            Id = id,
+            Title= movie.Title,
+            Poster = movie.Poster,
+            Showcasing = movie.Showcasing,
+            DatePremiere = movie.DatePremiere
+        };
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateMovie([FromForm]MovieCreateDto movieDto)
+    public async Task<ActionResult> CreateMovie([FromForm]MovieCreateDto createMovieDto)
     {
-        var movie = _mapper.Map<Movie>(movieDto);
-        if (movieDto.Poster != null)
+        var movie = _mapper.Map<Movie>(createMovieDto);
+        if (createMovieDto.Poster != null)
         {
             using (var memoryStream = new MemoryStream())
             {
-                await movieDto.Poster.CopyToAsync(memoryStream);
+                await createMovieDto.Poster.CopyToAsync(memoryStream);
                 var content = memoryStream.ToArray();
-                var extension = Path.GetExtension(movieDto.Poster.FileName);
-                movie.Poster = await _fileManager.SaveFile(content, extension, _container, movieDto.Poster.ContentType);
+                var extension = Path.GetExtension(createMovieDto.Poster.FileName);
+                movie.Poster = await _fileManager.SaveFile(content, extension, _container, createMovieDto.Poster.ContentType);
             }
         }
+        OrderActors(movie);
         _context.Add(movie);
-        var result = await _context.SaveChangesAsync() >0;
-        if (result) return CreatedAtRoute("GetMovie", new { Id = movie.Id}, movie);
-        
-        return BadRequest(new ProblemDetails {Title = "Problem creating new movie"});
+   
+        await _context.SaveChangesAsync();
+        var movieDto = _mapper.Map<MovieDto>(movie);
+        return new CreatedAtRouteResult("GetMovie", new { Id = movie.Id}, movieDto);
+     
+        // return BadRequest(new ProblemDetails {Title = "Problem creating new movie"});
+    }
+
+    private void OrderActors(Movie movie)
+    {
+        if (movie.MoviesActors != null)
+        {
+            for (int i = 0; i < movie.MoviesActors.Count; i++)
+            {
+                movie.MoviesActors[i].Order = i;
+            }
+        }
     }
     
     [HttpPatch("{id}")]
@@ -87,7 +108,7 @@ public class MoviesController: ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult> UpdateMovie(int id, [FromForm] MovieCreateDto movieDto)
     {
-        var movie = await _context.Movies.FindAsync(id);
+        var movie = await _context.Movies.Include(x => x.MoviesActors).Include(x => x.MoviesGenres).FirstOrDefaultAsync(x => x.Id == id);
         if (movie == null)
         {
             return NotFound();
@@ -105,14 +126,14 @@ public class MoviesController: ControllerBase
                 movieDb.Poster = await _fileManager.EditFile(content, extension, _container, movieDb.Poster, movieDto.Poster.ContentType);
             }
         }
-        
+        OrderActors(movie);
         var result = await _context.SaveChangesAsync() > 0;
 
         if (result) return Ok(movie);
         return BadRequest(new ProblemDetails{Title = "Problem updating movie"});
     }
     
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteMovie(int id)
     {
         var movie = await _context.Movies.FindAsync(id);
