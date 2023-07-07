@@ -19,13 +19,15 @@ public class MoviesController: ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IFileManager _fileManager;
+    private readonly ILogger<MoviesController> _logger;
     private readonly string _container = "movies";
 
-    public MoviesController(ApplicationDbContext context, IMapper mapper, IFileManager fileManager)
+    public MoviesController(ApplicationDbContext context, IMapper mapper, IFileManager fileManager, ILogger<MoviesController> logger)
     {
         _context = context;
         _mapper = mapper;
         _fileManager = fileManager;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -171,7 +173,15 @@ public class MoviesController: ControllerBase
         if (!string.IsNullOrEmpty(filterMoviesDto.FieldOrder))
         {
             var typeOrder = filterMoviesDto.AscendingOrder ? "ascending" : "descending";
-            moviesQueryable = moviesQueryable.OrderBy($"{filterMoviesDto.FieldOrder} {typeOrder}");
+            try
+            {
+                moviesQueryable = moviesQueryable.OrderBy($"{filterMoviesDto.FieldOrder} {typeOrder}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+            }
+            
         }
 
         await HttpContext.PaginationParameters(moviesQueryable, filterMoviesDto.RegisterPerPage);
