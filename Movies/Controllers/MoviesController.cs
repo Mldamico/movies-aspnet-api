@@ -43,18 +43,18 @@ public class MoviesController: ControllerBase
     }
 
     [HttpGet("{id:int}", Name = "GetMovie")]
-    public async Task<ActionResult<MovieDto>> GetMovieById(int id)
+    public async Task<ActionResult<MovieDetailsDto>> GetMovieById(int id)
     {
-        var movie = await _context.Movies.FirstOrDefaultAsync(x => x.Id == id);
+        var movie = await _context.Movies.Include(x => x.MoviesActors)
+            .ThenInclude(x => x.Actor)
+            .Include(x => x.MoviesGenres)
+            .ThenInclude(x => x.Genre)
+            .FirstOrDefaultAsync(x => x.Id == id);
         if (movie == null) return NotFound();
-        // return _mapper.Map<MovieDto>(movie);
-        return new MovieDto {
-            Id = id,
-            Title= movie.Title,
-            Poster = movie.Poster,
-            Showcasing = movie.Showcasing,
-            DatePremiere = movie.DatePremiere
-        };
+
+        movie.MoviesActors = movie.MoviesActors.OrderBy(x => x.Order).ToList();
+        return _mapper.Map<MovieDetailsDto>(movie);
+       
     }
 
     [HttpPost]
