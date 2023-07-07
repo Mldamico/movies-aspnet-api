@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.JavaScript;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -5,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Movies.Data;
 using Movies.DTOs;
 using Movies.Entities;
+using Movies.Helpers;
 using Movies.Services;
 
 namespace Movies.Controllers;
@@ -26,10 +28,18 @@ public class MoviesController: ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<MovieDto>>> GetMovies()
+    public async Task<ActionResult<MovieIndexDto>> GetMovies()
     {
-        var movies = await _context.Movies.ToListAsync();
-        return _mapper.Map<List<MovieDto>>(movies);
+        var top = 5;
+        var today = DateTime.Today;
+        var releasingSoon = await _context.Movies.Where(x => x.DatePremiere > today).OrderBy(x => x.DatePremiere).Take(top).ToListAsync();
+        var showcasing = await _context.Movies.Where(x => x.Showcasing).Take(top).ToListAsync();
+        var result = new MovieIndexDto();
+        result.NextRelease = _mapper.Map<List<MovieDto>>(releasingSoon);
+        result.Showcasing = _mapper.Map<List<MovieDto>>(showcasing);
+        return result;
+        // var movies = await _context.Movies.ToListAsync();
+        // return _mapper.Map<List<MovieDto>>(movies);
     }
 
     [HttpGet("{id:int}", Name = "GetMovie")]
@@ -128,9 +138,40 @@ public class MoviesController: ControllerBase
         }
         OrderActors(movie);
         var result = await _context.SaveChangesAsync() > 0;
-
-        if (result) return Ok(movie);
+        var movieToShow = _mapper.Map<MovieDto>(movieDb);
+        if (result) return Ok(movieToShow);
         return BadRequest(new ProblemDetails{Title = "Problem updating movie"});
+    }
+
+    [HttpGet("filter")]
+    public async Task<ActionResult<List<MovieDto>>> GetMoviesByFilter([FromQuery] FilterMoviesDto filterMoviesDto)
+    {
+        var moviesQueryable = _context.Movies.AsQueryable();
+        if (!string.IsNullOrEmpty(filterMoviesDto.Title))
+        {
+            moviesQueryable = moviesQueryable.Where(x => x.Title.Contains(filterMoviesDto.Title));
+        }
+
+        if (filterMoviesDto.Showcasing)
+        {
+            moviesQueryable = moviesQueryable.Where(x => x.Showcasing);
+        }
+
+        if (filterMoviesDto.NextRelease)
+        {
+            moviesQueryable = moviesQueryable.Where(x => x.DatePremiere > DateTime.Today);
+        }
+
+        if (filterMoviesDto.GenreId != 0)
+        {
+            moviesQueryable = moviesQueryable.Where(x => x.MoviesGenres.Select(y => y.GenreId).Contains(filterMoviesDto.GenreId));
+        }
+
+        await HttpContext.PaginationParameters(moviesQueryable, filterMoviesDto.RegisterPerPage);
+
+        var movies = await moviesQueryable.Paginate(filterMoviesDto.Pagination).ToListAsync();
+
+        return _mapper.Map<List<MovieDto>>(movies);
     }
     
     [HttpDelete("{id:int}")]
