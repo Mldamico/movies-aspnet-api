@@ -18,5 +18,8 @@ public class FilterMoviesDto
     public int GenreId { get; set; }
     public bool Showcasing { get; set; }
     public bool NextRelease { get; set; }
-    
+
+    public string FieldOrder { get; set; }
+    public bool AscendingOrder { get; set; } = true;
+
 }

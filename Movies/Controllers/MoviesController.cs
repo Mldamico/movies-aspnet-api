@@ -1,3 +1,4 @@
+using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices.JavaScript;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
@@ -165,6 +166,12 @@ public class MoviesController: ControllerBase
         if (filterMoviesDto.GenreId != 0)
         {
             moviesQueryable = moviesQueryable.Where(x => x.MoviesGenres.Select(y => y.GenreId).Contains(filterMoviesDto.GenreId));
+        }
+
+        if (!string.IsNullOrEmpty(filterMoviesDto.FieldOrder))
+        {
+            var typeOrder = filterMoviesDto.AscendingOrder ? "ascending" : "descending";
+            moviesQueryable = moviesQueryable.OrderBy($"{filterMoviesDto.FieldOrder} {typeOrder}");
         }
 
         await HttpContext.PaginationParameters(moviesQueryable, filterMoviesDto.RegisterPerPage);
