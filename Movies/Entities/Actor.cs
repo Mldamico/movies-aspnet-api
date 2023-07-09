@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Movies.Entities;
 
-public class Actor
+public class Actor: IId
 {
     public int Id { get; set; }
     [Required]

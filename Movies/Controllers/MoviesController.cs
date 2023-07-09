@@ -1,5 +1,4 @@
 using System.Linq.Dynamic.Core;
-using System.Runtime.InteropServices.JavaScript;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +13,7 @@ namespace Movies.Controllers;
 
 [ApiController]
 [Route("api/movies")]
-public class MoviesController: ControllerBase
+public class MoviesController: CustomBaseController
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -22,7 +21,7 @@ public class MoviesController: ControllerBase
     private readonly ILogger<MoviesController> _logger;
     private readonly string _container = "movies";
 
-    public MoviesController(ApplicationDbContext context, IMapper mapper, IFileManager fileManager, ILogger<MoviesController> logger)
+    public MoviesController(ApplicationDbContext context, IMapper mapper, IFileManager fileManager, ILogger<MoviesController> logger) : base(context, mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -98,24 +97,7 @@ public class MoviesController: ControllerBase
     [HttpPatch("{id}")]
     public async Task<ActionResult<Actor>> UpdateMoviePatch(int id, JsonPatchDocument<MoviePatchDto> patchDocument)
     {
-        if (patchDocument == null) return BadRequest(new ProblemDetails {Title = "Problem updating the movie"});
-        var movie = await _context.Movies.FindAsync(id);
-        if (movie == null) return NotFound();
-
-        var movieDto = _mapper.Map<MoviePatchDto>(movie);
-        
-        patchDocument.ApplyTo(movieDto, ModelState);
-
-        var isValid = TryValidateModel(movieDto);
-
-        if (!isValid) return BadRequest(ModelState);
-
-        _mapper.Map(movieDto, movie);
-
-        var result = await _context.SaveChangesAsync() > 0;
-
-        if (result) return Ok(movie);
-        return BadRequest(new ProblemDetails{Title = "Problem updating movie"});
+        return await Patch<Movie, MoviePatchDto>(id, patchDocument);
     }
 
     [HttpPut("{id:int}")]
@@ -194,17 +176,7 @@ public class MoviesController: ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteMovie(int id)
     {
-        var movie = await _context.Movies.FindAsync(id);
-        if (movie == null)
-        {
-            return NotFound();
-        }
-
-        _context.Movies.Remove(movie);
-
-        var result = await _context.SaveChangesAsync() > 0;
-        if (result) return Ok();
-        return BadRequest(new ProblemDetails {Title = "Problem deleting movie"});
+        return await Delete<Movie>(id);
     }
 
 }

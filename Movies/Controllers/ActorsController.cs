@@ -1,25 +1,23 @@
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Movies.Data;
 using Movies.DTOs;
 using Movies.Entities;
-using Movies.Helpers;
 using Movies.Services;
 
 namespace Movies.Controllers;
 
 [ApiController]
 [Route("api/actors")]
-public class ActorsController : ControllerBase
+public class ActorsController : CustomBaseController
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IFileManager _fileManager;
     private readonly string _container = "actors";
 
-    public ActorsController(ApplicationDbContext context, IMapper mapper, IFileManager fileManager)
+    public ActorsController(ApplicationDbContext context, IMapper mapper, IFileManager fileManager): base(context, mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -29,21 +27,14 @@ public class ActorsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<ActorDto>>> GetActors([FromQuery] PaginationDto paginationDto)
     {
-        var queryable = _context.Actors.AsQueryable();
-        await HttpContext.PaginationParameters(queryable, paginationDto.AmountPerPage);
-        var actors = await queryable.Paginate(paginationDto).ToListAsync();
-        return  _mapper.Map<List<ActorDto>>(actors);
-       
+        return await GetPagination<Actor, ActorDto>(paginationDto);
+
     }
 
     [HttpGet("{id:int}", Name = "GetActor")]
     public async Task<ActionResult<ActorDto>> GetActorById(int id)
     {
-        var actor = await _context.Actors.FindAsync(id);
-        if (actor == null) return NotFound();
-        
-        var actorDto  = _mapper.Map<ActorDto>(actor);
-        return actorDto;
+        return await GetById<Actor, ActorDto>(id);
     }
 
     [HttpPost]
@@ -72,24 +63,7 @@ public class ActorsController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<ActionResult<Actor>> UpdateActorPatch(int id, JsonPatchDocument<ActorPatchDto> patchDocument)
     {
-        if (patchDocument == null) return BadRequest(new ProblemDetails {Title = "Problem updating the actor"});
-        var actor = await _context.Actors.FindAsync(id);
-        if (actor == null) return NotFound();
-
-        var actorDto = _mapper.Map<ActorPatchDto>(actor);
-        
-        patchDocument.ApplyTo(actorDto, ModelState);
-
-        var isValid = TryValidateModel(actorDto);
-
-        if (!isValid) return BadRequest(ModelState);
-
-        _mapper.Map(actorDto, actor);
-
-        var result = await _context.SaveChangesAsync() > 0;
-
-        if (result) return Ok(actor);
-        return BadRequest(new ProblemDetails{Title = "Problem updating actor"});
+        return await Patch<Actor, ActorPatchDto>(id, patchDocument);
     }
     
     [HttpPut("{id:int}")]
@@ -123,17 +97,7 @@ public class ActorsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteActor(int id)
     {
-        var actor = await _context.Actors.FindAsync(id);
-        if (actor == null)
-        {
-            return NotFound();
-        }
-
-        _context.Actors.Remove(actor);
-
-        var result = await _context.SaveChangesAsync() > 0;
-        if (result) return Ok();
-        return BadRequest(new ProblemDetails {Title = "Problem deleting actor"});
+        return await Delete<Actor>(id);
     }
 
 

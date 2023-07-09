@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Movies.Entities;
 
-public class Genre
+public class Genre: IId
 {
     public int Id { get; set; }
     [Required]
