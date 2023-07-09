@@ -21,6 +21,8 @@ public class AutoMapperProfiles : Profile
         CreateMap<Movie, MovieDetailsDto>().ForMember(x => x.Genres, opt =>
             opt.MapFrom(MapMoviesGenres))
             .ForMember(x => x.Actors, opt => opt.MapFrom(MapMoviesActors));
+        CreateMap<Cinema, CinemaDto>().ReverseMap();
+        CreateMap<CinemaCreateDto, Cinema>();
     }
 
     private List<ActorMovieDetailDto> MapMoviesActors(Movie movie, MovieDetailsDto movieDetailsDto)
