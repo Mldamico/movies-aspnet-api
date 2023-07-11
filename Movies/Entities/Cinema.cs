@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using NetTopologySuite.Geometries;
 
 namespace Movies.Entities;
 
@@ -10,6 +11,6 @@ public class Cinema : IId
     public string Name { get; set; }
 
     public List<MoviesCinemas> MoviesCinemas { get; set; }
-    
+   
     
 }

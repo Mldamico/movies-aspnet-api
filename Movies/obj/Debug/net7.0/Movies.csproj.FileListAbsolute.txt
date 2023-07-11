@@ -55,3 +55,8 @@
 /Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/Newtonsoft.Json.dll
 /Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/Newtonsoft.Json.Bson.dll
 /Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/System.Linq.Dynamic.Core.dll
+/Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/NetTopologySuite.dll
+/Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/NetTopologySuite.IO.PostGis.dll
+/Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite.dll
+/Users/sebastiandamico/RiderProjects/Movies/Movies/bin/Debug/net7.0/Npgsql.NetTopologySuite.dll
+/Users/sebastiandamico/RiderProjects/Movies/Movies/obj/Debug/net7.0/EFCoreNpgsqlNetTopologySuite.cs

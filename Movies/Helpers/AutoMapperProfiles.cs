@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Movies.DTOs;
 using Movies.Entities;
 
@@ -23,6 +24,7 @@ public class AutoMapperProfiles : Profile
             .ForMember(x => x.Actors, opt => opt.MapFrom(MapMoviesActors));
         CreateMap<Cinema, CinemaDto>().ReverseMap();
         CreateMap<CinemaCreateDto, Cinema>();
+        CreateMap<IdentityUser, UserDto>();
     }
 
     private List<ActorMovieDetailDto> MapMoviesActors(Movie movie, MovieDetailsDto movieDetailsDto)
