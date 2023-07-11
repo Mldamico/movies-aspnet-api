@@ -28,7 +28,7 @@ public class Startup
         services.AddControllers();
             // .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"), opt => opt.UseNetTopologySuite()));
 
         services.AddIdentity<IdentityUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()

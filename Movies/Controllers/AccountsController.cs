@@ -14,15 +14,15 @@ using Movies.DTOs;
 namespace Movies.Controllers;
 
 [ApiController]
-[Route("api/cuentas")]
-public class CuentasController : CustomBaseController
+[Route("api/accounts")]
+public class AccountController : CustomBaseController
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly IConfiguration _configuration;
-    private readonly ApplicationDbContext context;
+    private readonly ApplicationDbContext _context;
 
-    public CuentasController(
+    public AccountController(
         UserManager<IdentityUser> userManager,
         SignInManager<IdentityUser> signInManager,
         IConfiguration configuration,
@@ -33,10 +33,10 @@ public class CuentasController : CustomBaseController
         _userManager = userManager;
         _signInManager = signInManager;
         _configuration = configuration;
-        this.context = context;
+        _context = context;
     }
 
-    [HttpPost("Crear")]
+    [HttpPost("signup")]
     public async Task<ActionResult<UserToken>> CreateUser([FromBody] UserInfo model)
     {
         var user = new IdentityUser {UserName = model.Email, Email = model.Email};
@@ -44,7 +44,7 @@ public class CuentasController : CustomBaseController
 
         if (result.Succeeded)
         {
-            return await ConstruirToken(model);
+            return await BuildToken(model);
         }
         else
         {
@@ -52,15 +52,15 @@ public class CuentasController : CustomBaseController
         }
     }
 
-    [HttpPost("Login")]
+    [HttpPost("login")]
     public async Task<ActionResult<UserToken>> Login([FromBody] UserInfo model)
     {
-        var resultado = await _signInManager.PasswordSignInAsync(model.Email,
+        var result = await _signInManager.PasswordSignInAsync(model.Email,
             model.Password, isPersistent: false, lockoutOnFailure: false);
 
-        if (resultado.Succeeded)
+        if (result.Succeeded)
         {
-            return await ConstruirToken(model);
+            return await BuildToken(model);
         }
         else
         {
@@ -68,7 +68,7 @@ public class CuentasController : CustomBaseController
         }
     }
 
-    [HttpPost("RenovarToken")]
+    [HttpPost("refresh-token")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<UserToken>> Renovar()
     {
@@ -77,10 +77,10 @@ public class CuentasController : CustomBaseController
             Email = HttpContext.User.Identity.Name
         };
 
-        return await ConstruirToken(userInfo);
+        return await BuildToken(userInfo);
     }
 
-    private async Task<UserToken> ConstruirToken(UserInfo userInfo)
+    private async Task<UserToken> BuildToken(UserInfo userInfo)
     {
         var claims = new List<Claim>()
         {
@@ -119,7 +119,7 @@ public class CuentasController : CustomBaseController
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<ActionResult<List<UserDto>>> Get([FromQuery] PaginationDto paginationDto)
     {
-        var queryable = context.Users.AsQueryable();
+        var queryable = _context.Users.AsQueryable();
         queryable = queryable.OrderBy(x => x.Email);
         return await GetPagination<IdentityUser, UserDto>(paginationDto);
     }
@@ -128,7 +128,7 @@ public class CuentasController : CustomBaseController
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<ActionResult<List<string>>> GetRoles()
     {
-        return await context.Roles.Select(x => x.Name).ToListAsync();
+        return await _context.Roles.Select(x => x.Name).ToListAsync();
     }
 
     [HttpPost("set-role")]
