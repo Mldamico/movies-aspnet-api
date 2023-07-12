@@ -1,13 +1,16 @@
+using System.IO.Hashing;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Movies.DTOs;
 using Movies.Entities;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 
 namespace Movies.Helpers;
 
 public class AutoMapperProfiles : Profile
 {
-    public AutoMapperProfiles()
+    public AutoMapperProfiles(GeometryFactory geometryFactory)
     {
         CreateMap<Genre, GenreDto>().ReverseMap();
         CreateMap<GenreCreateDto, Genre>();
@@ -22,8 +25,14 @@ public class AutoMapperProfiles : Profile
         CreateMap<Movie, MovieDetailsDto>().ForMember(x => x.Genres, opt =>
             opt.MapFrom(MapMoviesGenres))
             .ForMember(x => x.Actors, opt => opt.MapFrom(MapMoviesActors));
-        CreateMap<Cinema, CinemaDto>().ReverseMap();
-        CreateMap<CinemaCreateDto, Cinema>();
+        CreateMap<Cinema, CinemaDto>()
+            .ForMember(x => x.Latitude, x => x.MapFrom(y=> y.Address.Y))
+            .ForMember(x => x.Longitude, x=> x.MapFrom(y=> y.Address.X));
+        // var geomtryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+        CreateMap<CinemaDto, Cinema>().ForMember(x => x.Address, x => x.MapFrom(y =>
+            geometryFactory.CreatePoint(new Coordinate(y.Longitude, y.Latitude))));
+        CreateMap<CinemaCreateDto, Cinema>().ForMember(x => x.Address, x => x.MapFrom(y =>
+            geometryFactory.CreatePoint(new Coordinate(y.Longitude, y.Latitude))));;
         CreateMap<IdentityUser, UserDto>();
     }
 

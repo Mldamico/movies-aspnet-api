@@ -10,6 +10,7 @@ public class Cinema : IId
     [StringLength(120)]
     public string Name { get; set; }
 
+    public Point Address { get; set; }
     public List<MoviesCinemas> MoviesCinemas { get; set; }
    
     
