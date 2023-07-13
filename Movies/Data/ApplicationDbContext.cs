@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Movies.Entities;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 
 namespace Movies.Data;
 
@@ -64,6 +66,17 @@ public class ApplicationDbContext : IdentityDbContext
                     ClaimType = ClaimTypes.Role,
                     UserId = userAdminId,
                     ClaimValue = "Admin"
+                });
+            
+            var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+
+            modelBuilder.Entity<Cinema>()
+                .HasData(new List<Cinema>
+                {
+                    //new SalaDeCine{Id = 1, Nombre = "Agora", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
+                    new Cinema{Id = 4, Name = "Unicenter", Address = geometryFactory.CreatePoint(new Coordinate(-58.5257443, -34.5086035))},
+                    new Cinema{Id = 5, Name = "Al Oeste", Address = geometryFactory.CreatePoint(new Coordinate(-58.5835387, -34.6390319))},
+                    new Cinema{Id = 6, Name = "Village East Cinema", Address = geometryFactory.CreatePoint(new Coordinate(-73.986227, 40.730898))}
                 });
     }
 
