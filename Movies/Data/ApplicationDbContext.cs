@@ -43,41 +43,53 @@ public class ApplicationDbContext : IdentityDbContext
         var username = "adminUser";
         var email = "admin@gmail.com";
 
-            var userAdmin = new IdentityUser()
+        var userAdmin = new IdentityUser()
         {
             Id = userAdminId,
             UserName = username,
             NormalizedUserName = username,
             Email = email,
             NormalizedEmail = email,
-            PasswordHash = passwordHasher.HashPassword(null,"P$ssw0rd")
+            PasswordHash = passwordHasher.HashPassword(null, "P$ssw0rd")
         };
-            
-            modelBuilder.Entity<IdentityUser>()
-                .HasData(userAdmin);
-            
-            modelBuilder.Entity<IdentityRole>()
-                .HasData(adminRole);
-            
-            modelBuilder.Entity<IdentityUserClaim<string>>()
-                .HasData(new IdentityUserClaim<string>()
-                {
-                    Id = 1,
-                    ClaimType = ClaimTypes.Role,
-                    UserId = userAdminId,
-                    ClaimValue = "Admin"
-                });
-            
-            var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
-            modelBuilder.Entity<Cinema>()
-                .HasData(new List<Cinema>
+        modelBuilder.Entity<IdentityUser>()
+            .HasData(userAdmin);
+
+        modelBuilder.Entity<IdentityRole>()
+            .HasData(adminRole);
+
+        modelBuilder.Entity<IdentityUserClaim<string>>()
+            .HasData(new IdentityUserClaim<string>()
+            {
+                Id = 1,
+                ClaimType = ClaimTypes.Role,
+                UserId = userAdminId,
+                ClaimValue = "Admin"
+            });
+
+        var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+
+        modelBuilder.Entity<Cinema>()
+            .HasData(new List<Cinema>
+            {
+                //new SalaDeCine{Id = 1, Nombre = "Agora", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
+                new Cinema
                 {
-                    //new SalaDeCine{Id = 1, Nombre = "Agora", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
-                    new Cinema{Id = 4, Name = "Unicenter", Address = geometryFactory.CreatePoint(new Coordinate(-58.5257443, -34.5086035))},
-                    new Cinema{Id = 5, Name = "Al Oeste", Address = geometryFactory.CreatePoint(new Coordinate(-58.5835387, -34.6390319))},
-                    new Cinema{Id = 6, Name = "Village East Cinema", Address = geometryFactory.CreatePoint(new Coordinate(-73.986227, 40.730898))}
-                });
+                    Id = 4, Name = "Unicenter",
+                    Address = geometryFactory.CreatePoint(new Coordinate(-58.5257443, -34.5086035))
+                },
+                new Cinema
+                {
+                    Id = 5, Name = "Al Oeste",
+                    Address = geometryFactory.CreatePoint(new Coordinate(-58.5835387, -34.6390319))
+                },
+                new Cinema
+                {
+                    Id = 6, Name = "Village East Cinema",
+                    Address = geometryFactory.CreatePoint(new Coordinate(-73.986227, 40.730898))
+                }
+            });
     }
 
     public DbSet<Genre> Genres { get; set; }
@@ -87,4 +99,5 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<MoviesActors> MoviesActors { get; set; }
     public DbSet<Cinema> Cinemas { get; set; }
     public DbSet<MoviesCinemas> MoviesCinemas { get; set; }
+    public DbSet<Review> Reviews { get; set; }
 }

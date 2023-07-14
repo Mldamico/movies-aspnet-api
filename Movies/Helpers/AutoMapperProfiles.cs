@@ -34,6 +34,9 @@ public class AutoMapperProfiles : Profile
         CreateMap<CinemaCreateDto, Cinema>().ForMember(x => x.Address, x => x.MapFrom(y =>
             geometryFactory.CreatePoint(new Coordinate(y.Longitude, y.Latitude))));;
         CreateMap<IdentityUser, UserDto>();
+        CreateMap<Review, ReviewDto>().ForMember(x => x.Username, x=> x.MapFrom(y => y.User.UserName));
+        CreateMap<ReviewDto, Review>();
+        CreateMap<ReviewCreateDto, Review>();
     }
 
     private List<ActorMovieDetailDto> MapMoviesActors(Movie movie, MovieDetailsDto movieDetailsDto)

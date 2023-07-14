@@ -30,6 +30,7 @@ public class Startup
         services.AddAutoMapper(typeof(Startup));
         // services.AddEndpointsApiExplorer();
         services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
+        services.AddScoped<MovieExistAttribute>();
         services.AddSingleton(provider => new MapperConfiguration(config =>
         {
             var geometryFactory = provider.GetRequiredService<GeometryFactory>();
@@ -43,7 +44,8 @@ public class Startup
         services.AddIdentity<IdentityUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-
+        
+        
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options => 
                 options.TokenValidationParameters = new TokenValidationParameters

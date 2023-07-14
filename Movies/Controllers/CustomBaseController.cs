@@ -30,6 +30,11 @@ public class CustomBaseController: ControllerBase
     protected async Task<List<TDto>> GetPagination<TEntity, TDto>(PaginationDto paginationDto) where TEntity : class
     {
         var queryable = _context.Set<TEntity>().AsQueryable();
+        return await GetPagination<TEntity, TDto>(paginationDto, queryable);
+    }
+    
+    protected async Task<List<TDto>> GetPagination<TEntity, TDto>(PaginationDto paginationDto, IQueryable<TEntity> queryable) where TEntity : class
+    {
         await HttpContext.PaginationParameters(queryable, paginationDto.AmountPerPage);
         var entities = await queryable.Paginate(paginationDto).ToListAsync();
         return _mapper.Map<List<TDto>>(entities);
