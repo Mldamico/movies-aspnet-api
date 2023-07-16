@@ -61,7 +61,7 @@ public class ActorsController : CustomBaseController
     }
 
     [HttpPatch("{id}")]
-    public async Task<ActionResult<Actor>> UpdateActorPatch(int id, JsonPatchDocument<ActorPatchDto> patchDocument)
+    public async Task<ActionResult> UpdateActorPatch(int id, JsonPatchDocument<ActorPatchDto> patchDocument)
     {
         return await Patch<Actor, ActorPatchDto>(id, patchDocument);
     }

@@ -102,7 +102,7 @@ public class CustomBaseController: ControllerBase
 
         var result = await _context.SaveChangesAsync() > 0;
 
-        if (result) return Ok(entity);
+        if (result) return NoContent();
         return BadRequest(new ProblemDetails{Title = "Problem updating actor"});
     }
 }

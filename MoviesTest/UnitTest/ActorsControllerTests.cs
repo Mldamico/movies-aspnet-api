@@ -1,6 +1,10 @@
 using System.Text;
+
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Movies.Controllers;
@@ -11,8 +15,10 @@ using Movies.Services;
 namespace MoviesTest.UnitTest;
 
 [TestClass]
-public class MoviesControllerTests : TestBase
+public class ActorsControllerTests : TestBase
 {
+    
+
     [TestMethod]
     public async Task GetActorsPagination()
     {
@@ -95,5 +101,51 @@ public class MoviesControllerTests : TestBase
         
         Assert.AreEqual(1, mock.Invocations.Count);
 
+    }
+
+    [TestMethod]
+    public async Task PatchActor_ShouldReturn404_IfActorDoesNotExists()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        var controller = new ActorsController(context, mapper, null);
+        var patchDoc = new JsonPatchDocument<ActorPatchDto>();
+        var response = await controller.UpdateActorPatch(1, patchDoc);
+        var result = response as StatusCodeResult;
+        Assert.AreEqual(404, result.StatusCode);
+    }
+    
+    [TestMethod]
+    public async Task PatchActor_ShouldSuccessChangeOneField_IfOnlyOnFieldIsUpdated()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+        var birthDate = DateTime.Now;
+        var actor = new Actor(){Name = "Test", BirthDate = birthDate};
+        context.Add(actor);
+        await context.SaveChangesAsync();
+        var context2 = BuildContext(nameDb);
+        var controller = new ActorsController(context2, mapper, null);
+        var objectValidator = new Mock<IObjectModelValidator>();
+        objectValidator.Setup(x => x.Validate(It.IsAny<ActionContext>(), 
+            It.IsAny<ValidationStateDictionary>(),
+            It.IsAny<string>(),
+            It.IsAny<object>()));
+
+        controller.ObjectValidator = objectValidator.Object;
+        var patchDoc = new JsonPatchDocument<ActorPatchDto>();
+        patchDoc.Operations.Add(new Operation<ActorPatchDto>("replace","/name", null, "New Value"));
+        var response = await controller.UpdateActorPatch(1, patchDoc);
+        var result = response as StatusCodeResult;
+       
+        Assert.AreEqual(204, result.StatusCode);
+
+        var context3 = BuildContext(nameDb);
+        var actorDb = await context3.Actors.FirstAsync();
+        Assert.AreEqual("New Value", actorDb.Name);
+        Assert.AreEqual(birthDate, actorDb.BirthDate);
     }
 }
