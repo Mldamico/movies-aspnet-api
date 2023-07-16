@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="moviesapp@localhost" uuid="fdc31a3e-7b29-41a1-bd60-a1d6b531b2c6">
+    <data-source source="LOCAL" name="movies-postgis@localhost" uuid="fdc31a3e-7b29-41a1-bd60-a1d6b531b2c6">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/moviesapp</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="moviesapp@localhost [2]" uuid="5bd42a60-d6d1-4e1a-9893-4212906c51e6">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/moviesapp</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/movies-postgis</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

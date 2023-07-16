@@ -68,7 +68,7 @@ public class ReviewController : CustomBaseController
 
     }
 
-    [HttpDelete("{revieId:int}")]
+    [HttpDelete("{reviewId:int}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> DeleteReview(int reviewId)
     {
