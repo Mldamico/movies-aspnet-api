@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,35 @@ public class MoviesControllerTests : TestBase
         Assert.AreEqual(1, actors.Count);
         Assert.IsNull(actors[0].Photo);
         Assert.AreEqual(0, mock.Invocations.Count);
+
+    }
+    
+    [TestMethod]
+    public async Task CreateActorWithPhoto_ShouldWork()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+        var content = Encoding.UTF8.GetBytes("Photo Image");
+        var file = new FormFile(new MemoryStream(content),0, content.Length, "Data","photo.jpg");
+        file.Headers = new HeaderDictionary();
+        file.ContentType = "image/jpg";
+        
+        var actor = new ActorCreateDto() {Name = "Random", BirthDate = DateTime.Now, Photo = file};
+        var mock = new Mock<IFileManager>();
+        mock.Setup(x => x.SaveFile(content, ".jpg", "actors", file.ContentType)).Returns(Task.FromResult("url"));
+
+        var controller = new ActorsController(context, mapper, mock.Object);
+        var response = await controller.CreateActor(actor);
+        var result = response as CreatedAtRouteResult;
+        Assert.AreEqual(201, result.StatusCode);
+
+        var context2 = BuildContext(nameDb);
+        var actors = await context2.Actors.ToListAsync();
+        Assert.AreEqual(1, actors.Count);
+        Assert.AreEqual("url",actors[0].Photo);
+        
+        Assert.AreEqual(1, mock.Invocations.Count);
 
     }
 }
