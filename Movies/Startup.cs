@@ -44,8 +44,8 @@ public class Startup
         services.AddIdentity<IdentityUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-        
-        
+
+        services.AddCors();
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options => 
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -71,6 +71,11 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
+        app.UseCors(opt =>
+        {
+            opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:5173");
+        });
+        app.UseAuthorization();
         app.UseAuthorization();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
