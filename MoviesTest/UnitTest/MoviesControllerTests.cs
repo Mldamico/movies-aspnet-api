@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Movies.Controllers;
@@ -11,6 +12,84 @@ namespace MoviesTest.UnitTest;
 public class MoviesControllerTests: TestBase
 {
 
+    [TestMethod]
+    public async Task GetAllMovies_ShowcasingList_ShouldReturnShowcasingMovies()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        context.Movies.Add(new Movie() {Title = "Movie 1", Showcasing = true});
+        context.Movies.Add(new Movie() {Title = "Movie 2", Showcasing = true});
+        context.Movies.Add(new Movie() {Title = "Movie 3", Showcasing = false});
+        await context.SaveChangesAsync();
+
+        var context2 = BuildContext(nameDb);
+
+        var controller = new MoviesController(context2, mapper, null, null);
+        var response = await controller.GetMovies();
+
+        var movies = response.Value;
+
+        Assert.AreEqual(2, movies.Showcasing.Count);
+    }
+
+    [TestMethod]
+    public async Task GetAllMovies_NextReleasingList_ShouldReturnNextReleasingMovies()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        context.Movies.Add(new Movie() {Title = "Movie 1", DatePremiere = DateTime.Today.AddDays(1)});
+        context.Movies.Add(new Movie() {Title = "Movie 2", DatePremiere = DateTime.Today.AddDays(1)});
+        context.Movies.Add(new Movie() {Title = "Movie 3", DatePremiere = DateTime.Today.AddDays(-1)});
+        await context.SaveChangesAsync();
+
+        var context2 = BuildContext(nameDb);
+
+        var controller = new MoviesController(context2, mapper, null, null);
+        var response = await controller.GetMovies();
+
+        var movies = response.Value;
+
+        Assert.AreEqual(2, movies.NextRelease.Count);
+    }
+    
+    
+    [TestMethod]
+    public async Task GetMovieById_WithInvalidId_ShouldReturnError()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        var controller = new MoviesController(context, mapper, null, null);
+        var response = await controller.GetMovieById(1);
+
+        var result = response.Result as StatusCodeResult;
+        Assert.AreEqual(404, result.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task GetMovieById_WithValidId_ShouldReturnAMovie()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+        
+        context.Movies.Add(new Movie() {Title = "Movie 1"});
+        await context.SaveChangesAsync();
+        var context2 = BuildContext(nameDb);
+
+        var moviesController = new MoviesController(context2, mapper, null, null);
+
+        var response = await moviesController.GetMovieById(1);
+        var result = response.Value;
+        Assert.AreEqual("Movie 1", result.Title);
+    }
+
+    
     [TestMethod]
     public async Task FilterMovies_FilterByTitle_ShallReturnMoviesFilteredByTitles()
     {
