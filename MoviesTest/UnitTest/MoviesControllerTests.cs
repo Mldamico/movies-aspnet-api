@@ -1,10 +1,14 @@
+using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Movies.Controllers;
 using Movies.DTOs;
 using Movies.Entities;
+using Movies.Services;
 
 namespace MoviesTest.UnitTest;
 
@@ -88,8 +92,59 @@ public class MoviesControllerTests: TestBase
         var result = response.Value;
         Assert.AreEqual("Movie 1", result.Title);
     }
-
     
+    [TestMethod]
+    public async Task CreateMovie_WithNoPoster_ShouldCreateMovieWithoutPoster()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+        var movie = new MovieCreateDto() { Title = "new movie"};
+        var controller = new MoviesController(context, mapper, null, null);
+        var response = await controller.CreateMovie(movie);
+        var result = response as CreatedAtRouteResult;
+        Assert.IsNotNull(result);
+        
+        var context2 = BuildContext(nameDb);
+        var amount = await context2.Movies.CountAsync();
+        Assert.AreEqual(1, amount);
+    }
+
+    [TestMethod]
+    public async Task CreateMovie_WithPoster_ShouldCreateMovieWithPoster()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+        var content = Encoding.UTF8.GetBytes("Photo Image");
+        var file = new FormFile(new MemoryStream(content), 0, content.Length, "Data", "photo.jpg");
+        file.Headers = new HeaderDictionary();
+        file.ContentType = "image/jpg";
+
+        var movie = new MovieCreateDto() {Title = "Movie", Poster = file};
+        var mock = new Mock<IFileManager>();
+        mock.Setup(x => x.SaveFile(content, ".jpg", "actors", file.ContentType)).Returns(Task.FromResult("url"));
+
+        var controller = new MoviesController(context, mapper, mock.Object, null);
+        var response = await controller.CreateMovie(movie);
+        var result = response as CreatedAtRouteResult;
+        Assert.AreEqual(201, result.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task PatchMovie_ShouldReturn404_IfMovieDoesNotExists()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        var controller = new MoviesController(context, mapper, null, null);
+        var patchDocument = new JsonPatchDocument<MoviePatchDto>();
+        var response = await controller.UpdateMoviePatch(1, patchDocument);
+        var result = response.Result as NotFoundResult;
+        Assert.AreEqual(404, result.StatusCode);
+    }
+
     [TestMethod]
     public async Task FilterMovies_FilterByTitle_ShallReturnMoviesFilteredByTitles()
     {
@@ -113,6 +168,31 @@ public class MoviesControllerTests: TestBase
         Assert.AreEqual(titleMovie, movies[0].Title);
     }
 
+    [TestMethod]
+    public async Task UpdateMovie_ShouldReturnTheMovie()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        context.Movies.Add(new Movie() {Title = "Movie 1"});
+
+        await context.SaveChangesAsync();
+
+        var context2 = BuildContext(nameDb);
+        var controller = new MoviesController(context2, mapper, null, null);
+        var genreCreateDto = new MovieCreateDto() {Title = "New Movie Name"};
+        var response = await controller.UpdateMovie(1, genreCreateDto);
+
+        
+        var result = response as OkObjectResult;
+        Assert.AreEqual(200, result.StatusCode);
+
+        var context3 = BuildContext(nameDb);
+        var exist = await context3.Movies.AnyAsync(x => x.Title == "New Movie Name");
+        Assert.IsTrue(exist);
+    }
+    
     [TestMethod]
     public async Task FilterMovies_FilterByCinema_ShouldReturnMoviesWhichAreShowcasingOnCinema()
     {
