@@ -194,6 +194,41 @@ public class MoviesControllerTests: TestBase
     }
     
     [TestMethod]
+    public async Task DeleteMovie_TryingRemoveWithInvalidID_shouldReturnError()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        var controller = new MoviesController(context, mapper, null, null);
+        var response = await controller.DeleteMovie(1);
+        var result = response as StatusCodeResult;
+        Assert.AreEqual(404, result.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task DeleteMovie_WithCorrectID_ShouldRemoveMovieSuccessfully()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        var movie = new Movie() { Title = "Test Movie"};
+        context.Movies.Add(movie);
+        await context.SaveChangesAsync();
+
+        var context2 = BuildContext(nameDb);
+        var moviesController = new MoviesController(context2, mapper, null, null);
+        var response = await moviesController.DeleteMovie(1);
+        var result = response as StatusCodeResult;
+        Assert.AreEqual(204, result.StatusCode);
+
+        var context3 = BuildContext(nameDb);
+        var exists = await context3.Movies.AnyAsync();
+        Assert.IsFalse(exists);
+    }
+    
+    [TestMethod]
     public async Task FilterMovies_FilterByCinema_ShouldReturnMoviesWhichAreShowcasingOnCinema()
     {
         var nameDb = DataTest();
