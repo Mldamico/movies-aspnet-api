@@ -181,8 +181,8 @@ public class MoviesControllerTests: TestBase
 
         var context2 = BuildContext(nameDb);
         var controller = new MoviesController(context2, mapper, null, null);
-        var genreCreateDto = new MovieCreateDto() {Title = "New Movie Name"};
-        var response = await controller.UpdateMovie(1, genreCreateDto);
+        var movieCreateDto = new MovieCreateDto() {Title = "New Movie Name"};
+        var response = await controller.UpdateMovie(1, movieCreateDto);
 
         
         var result = response as OkObjectResult;

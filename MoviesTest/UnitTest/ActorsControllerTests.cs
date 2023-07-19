@@ -148,4 +148,64 @@ public class ActorsControllerTests : TestBase
         Assert.AreEqual("New Value", actorDb.Name);
         Assert.AreEqual(birthDate, actorDb.BirthDate);
     }
+
+    [TestMethod]
+    public async Task UpdateActor_WithPutMethod_ShouldWork()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        context.Actors.Add(new Actor() {Name = "Actor 1"});
+
+        await context.SaveChangesAsync();
+
+        var context2 = BuildContext(nameDb);
+        var controller = new ActorsController(context2, mapper, null);
+        var actorCreateDto = new ActorCreateDto() {Name = "New Actor Name"};
+        var response = await controller.UpdateActor(1, actorCreateDto);
+
+
+        var result = response.Result as OkObjectResult;
+        Assert.AreEqual(200, result.StatusCode);
+        
+        var context3 = BuildContext(nameDb);
+        var exist = await context3.Actors.AnyAsync(x => x.Name == "New Actor Name");
+        Assert.IsTrue(exist);
+    }
+    
+    [TestMethod]
+    public async Task DeleteActor_TryingRemoveWithInvalidID_shouldReturnError()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        var controller = new ActorsController(context, mapper, null);
+        var response = await controller.DeleteActor(1);
+        var result = response as StatusCodeResult;
+        Assert.AreEqual(404, result.StatusCode);
+    }
+    
+    [TestMethod]
+    public async Task DeleteActor_WithCorrectID_ShouldRemoveActorSuccessfully()
+    {
+        var nameDb = Guid.NewGuid().ToString();
+        var context = BuildContext(nameDb);
+        var mapper = ConfigurateAutoMapper();
+
+        var actor = new Actor() { Name = "Test Actor"};
+        context.Actors.Add(actor);
+        await context.SaveChangesAsync();
+
+        var context2 = BuildContext(nameDb);
+        var actorController = new ActorsController(context2, mapper, null);
+        var response = await actorController.DeleteActor(1);
+        var result = response as StatusCodeResult;
+        Assert.AreEqual(204, result.StatusCode);
+
+        var context3 = BuildContext(nameDb);
+        var exists = await context3.Actors.AnyAsync();
+        Assert.IsFalse(exists);
+    }
 }
