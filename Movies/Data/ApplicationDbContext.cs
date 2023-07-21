@@ -73,7 +73,7 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<Cinema>()
             .HasData(new List<Cinema>
             {
-                //new SalaDeCine{Id = 1, Nombre = "Agora", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
+                
                 new Cinema
                 {
                     Id = 4, Name = "Unicenter",
